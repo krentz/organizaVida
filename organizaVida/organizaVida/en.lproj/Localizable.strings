@@ -1,0 +1,21 @@
+/* 
+  Localizable.strings
+  OrganizaVida
+
+  Created by Rafael Krentz on 11/05/25.
+  
+*/
+
+"add_new_topic" = "Add new list";
+"empty_list" = "You don't have any items registered yet, please add items to the list that will appear here.";
+
+//detalhes view
+"new_item" = "New Item";
+"add" = "Add";
+
+//PopupAdicionarTopico
+"description_optional" = "Description (optional)";
+"list_name" = "List name";
+"add_new_list" = "Add New List";
+"items" = "Items:";
+"edit_item" = "Edit Item";

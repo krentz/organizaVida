@@ -2,7 +2,8 @@ import SwiftUI
 import SwiftData
 
 struct DetalheItemView: View {
-    let item: Item
+    @Environment(\.modelContext) private var modelContext
+    @Bindable var item: Item
     @State private var mostrarPopup = false
     @State private var nomeItemFilho = ""
 
@@ -27,12 +28,13 @@ struct DetalheItemView: View {
                                 Text(itemFilho.nome)
                             }
                         }
+                        .onDelete(perform: removerItemFilho)
                     }
                     .listStyle(PlainListStyle())
                 }else{
                     VStack {
                         Spacer()
-                        Text("Ainda não tem nenhum item cadastrado, por favor adicione itens a lista que aparecerá aqui.")
+                        Text("empty_list", bundle: .main)
                            .foregroundColor(.gray)
                            .multilineTextAlignment(.center)
                            .frame(maxWidth: .infinity, alignment: .center)
@@ -42,19 +44,16 @@ struct DetalheItemView: View {
                 }
                 
                 HStack {
-                    TextField("Novo Item", text: $nomeItemFilho)
+                    TextField(LocalizedStringKey("new_item"), text: $nomeItemFilho)
                         .padding()
                         .background(Color(.systemGray6))
                         .cornerRadius(8)
 
-                    Button("Adicionar") {
-                       
-                        
+                    Button(LocalizedStringKey("add")) {
                         withAnimation(.easeInOut(duration: 0.2)) {
                             item.itensRelacionados.append(ItemFilho(nome: nomeItemFilho, foiExecutado: false))
                         }
                         nomeItemFilho = ""
-        
                     }
                     .estiloBotaoPequeno()
                     .disabled(nomeItemFilho.isEmpty)
@@ -64,6 +63,14 @@ struct DetalheItemView: View {
             }
             .padding()
 
+        }
+    }
+    
+    func removerItemFilho(at offsets: IndexSet) {
+        withAnimation {
+            offsets.map { item.itensRelacionados[$0] }.forEach { itemFilhoParaRemover in
+                modelContext.delete(itemFilhoParaRemover)
+            }
         }
     }
 }

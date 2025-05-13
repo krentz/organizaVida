@@ -15,29 +15,29 @@ struct PopupAdicionarTopico: View {
     var body: some View {
         VStack {
             VStack {
-                Text("Adicionar nova Lista")
+                Text("add_new_list", bundle: .main)
                     .font(.headline)
                     .padding(.top)
 
-                TextField("Nome da lista", text: $titulo)
+                TextField(LocalizedStringKey("list_name"), text: $titulo)
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color(.secondarySystemBackground))
                     .cornerRadius(8)
                     .padding(.horizontal)
 
-                TextField("Descrição (opcional)", text: $descricao)
+                TextField(LocalizedStringKey("description_optional"), text: $descricao)
                     .padding()
-                    .background(Color(.systemGray6))
+                    .background(Color(.secondarySystemBackground))
                     .cornerRadius(8)
                     .padding(.horizontal)
 
                 HStack {
-                    TextField("Novo item", text: $nomeNovoItemFilho)
+                    TextField(LocalizedStringKey("new_item"), text: $nomeNovoItemFilho)
                         .padding()
-                        .background(Color(.systemGray6))
+                        .background(Color(.secondarySystemBackground))
                         .cornerRadius(8)
 
-                    Button("Adicionar") {
+                    Button(LocalizedStringKey("add")) {
                         if !nomeNovoItemFilho.isEmpty {
                             let novoItem = ItemFilho(nome: nomeNovoItemFilho, foiExecutado: false)
                             withAnimation(.easeInOut(duration: 0.2)) {
@@ -55,7 +55,7 @@ struct PopupAdicionarTopico: View {
             Spacer()
 
             if !itensFilhoRelacionados.isEmpty {
-                Text("Items:")
+                Text("items", bundle: .main)
                     .font(.subheadline)
                     .padding(.horizontal)
 
@@ -67,7 +67,7 @@ struct PopupAdicionarTopico: View {
                                 .padding(.trailing, 5)
 
                             if item.id == indiceItemEmEdicao {
-                                TextField("Editar Item", text: $item.nome)
+                                TextField(LocalizedStringKey("edit_list"), text: $item.nome)
                                     .focused($textFieldEmFoco, equals: item.id)
                                     .onSubmit {
                                         indiceItemEmEdicao = nil
@@ -95,7 +95,7 @@ struct PopupAdicionarTopico: View {
                 .listStyle(PlainListStyle())
             }
 
-            Button("Adicionar") {
+            Button(LocalizedStringKey("add")) {
                 onAdicionar(titulo, descricao, itensFilhoRelacionados)
                 mostrarPopup = false
             }

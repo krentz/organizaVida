@@ -24,13 +24,12 @@ struct ContentView: View {
                             }
                         }
                         .onDelete(perform: excluirItens)
-                        //    .onMove(perform: moverItemFilho)
                         .listStyle(PlainListStyle())
                     }
                 } else {
                     VStack {
                         Spacer()
-                        Text("Ainda não tem nenhum item cadastrado, por favor adicione itens a lista que aparecerá aqui.")
+                        Text("empty_list", bundle: .main)
                             .foregroundColor(.gray)
                             .multilineTextAlignment(.center)
                             .frame(maxWidth: .infinity, alignment: .center)
@@ -69,7 +68,7 @@ struct ContentView: View {
                         Image(systemName: "plus")
                             .foregroundColor(.white)
                     }
-                Text("Adicionar nova lista")
+                Text("add_new_topic", bundle: .main)
                     .font(.headline)
             }
             .padding()
@@ -143,7 +142,7 @@ struct ContentView: View {
     }
 }
 
-//#Preview {
-//    ContentView()
-//        .modelContainer(for: Item.self, inMemory: true)
-//}
+#Preview {
+    ContentView()
+        .modelContainer(for: Item.self, inMemory: true)
+}
