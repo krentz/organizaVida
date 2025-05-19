@@ -17,5 +17,6 @@
 "description_optional" = "Descrição (opcional)";
 "list_name" = "Nome da lista";
 "add_new_list" = "Adicionar nova Lista";
-"items" = "Items:";
+"items" = "Itens:";
 "edit_item" = "Editar Item";
+"empty_share_list" = "Lista vazia";

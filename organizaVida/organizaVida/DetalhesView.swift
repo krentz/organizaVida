@@ -6,7 +6,24 @@ struct DetalheItemView: View {
     @Bindable var item: Item
     @State private var mostrarPopup = false
     @State private var nomeItemFilho = ""
+    @State private var isShareSheetShowing = false
 
+    private var shareableContent: String {
+        var text = "\(item.titulo)\n\n"
+        if !item.descricao.isEmpty {
+            text += "\(item.descricao)\n\n"
+        }
+        if !item.itensRelacionados.isEmpty {
+            text += "\(LocalizedStringKey("items")):\n"
+            for itemFilho in item.itensRelacionados.sorted(by: { !$0.foiExecutado && $1.foiExecutado }) {
+                text += "- \(itemFilho.nome) \(itemFilho.foiExecutado ? " ✅" : "")\n"
+            }
+        } else {
+            text += "\(LocalizedStringKey("empty_share_list"))\n"
+        }
+        return text
+    }
+    
     var body: some View {
         ZStack {
             VStack {
@@ -62,7 +79,15 @@ struct DetalheItemView: View {
                 .padding(.horizontal)
             }
             .padding()
-
+        }
+        .navigationTitle("")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                ShareLink(item: shareableContent) {
+                    Image(systemName: "square.and.arrow.up")
+                }
+            }
         }
     }
     
