@@ -19,7 +19,7 @@
 "description_optional" = "Descrição (opcional)";
 "list_name" = "Nome da lista";
 "add_new_list" = "Adicionar nova Lista";
-"items" = "Itens";
+"items" = "Itens:";
 "edit_item" = "Editar Item";
 "empty_share_list" = "Lista vazia";
 
@@ -29,9 +29,8 @@
 "shareItem" = "Compartilhar";
 "editItem" = "Editar";
 "removeItem" = "Excluir";
-"edit_list_title" = "Editar lista";
 
 //welcomeView
-"welcome_card_title" = "Seja bem-vindo ao app!!";
+"welcome_card_title" = "Seja bem vindo ao app!!";
 "welcome_card_message" = "Nele vamos conseguir criar listas pra nos auxiliar na vida num geral e no dia a dia com pequenas coisas  também!";
-"create_first_list_button" = "Criar a primeira lista";
+"create_first_list_button" = "Vamos criar a primeira lista?";

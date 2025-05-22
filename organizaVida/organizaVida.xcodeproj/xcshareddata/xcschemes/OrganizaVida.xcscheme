@@ -18,7 +18,7 @@
                BlueprintIdentifier = "3C3D1A482D999C6A00761377"
                BuildableName = "OrganizaVida.app"
                BlueprintName = "OrganizaVida"
-               ReferencedContainer = "container:OrganizaVida.xcodeproj">
+               ReferencedContainer = "container:organizaVida.xcodeproj">
             </BuildableReference>
          </BuildActionEntry>
       </BuildActionEntries>
@@ -47,7 +47,7 @@
             BlueprintIdentifier = "3C3D1A482D999C6A00761377"
             BuildableName = "OrganizaVida.app"
             BlueprintName = "OrganizaVida"
-            ReferencedContainer = "container:OrganizaVida.xcodeproj">
+            ReferencedContainer = "container:organizaVida.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </LaunchAction>
@@ -64,7 +64,7 @@
             BlueprintIdentifier = "3C3D1A482D999C6A00761377"
             BuildableName = "OrganizaVida.app"
             BlueprintName = "OrganizaVida"
-            ReferencedContainer = "container:OrganizaVida.xcodeproj">
+            ReferencedContainer = "container:organizaVida.xcodeproj">
          </BuildableReference>
       </BuildableProductRunnable>
    </ProfileAction>

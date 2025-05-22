@@ -2,30 +2,28 @@ import SwiftUI
 
 struct PopupAdicionarTopico: View {
     @Binding var mostrarPopup: Bool
-    @Binding var titulo: String
-    @Binding var descricao: String
-    @Binding var itensFilhoRelacionados: [ItemFilho]
+    @State var tituloLocal: String = ""
+    @State var descricaoLocal: String = ""
+    @State var itensFilhoEditaveis: [ItemFilho] = []
+
+    var itemParaEditar: Item?
 
     @State private var nomeNovoItemFilho: String = ""
     @State private var indiceItemEmEdicao: UUID?
     @FocusState private var textFieldEmFoco: UUID?
 
-    var onAdicionar: (String, String, [ItemFilho]) -> Void
+    var onSave: (String, String, [ItemFilho]) -> Void
 
     var body: some View {
-        VStack {
+        NavigationView {
             VStack {
-                Text("add_new_list", bundle: .main)
-                    .font(.headline)
-                    .padding(.top)
-
-                TextField(LocalizedStringKey("list_name"), text: $titulo)
+                TextField(LocalizedStringKey("list_name"), text: $tituloLocal)
                     .padding()
                     .background(Color(.secondarySystemBackground))
                     .cornerRadius(8)
                     .padding(.horizontal)
 
-                TextField(LocalizedStringKey("description_optional"), text: $descricao)
+                TextField(LocalizedStringKey("description_optional"), text: $descricaoLocal)
                     .padding()
                     .background(Color(.secondarySystemBackground))
                     .cornerRadius(8)
@@ -36,12 +34,12 @@ struct PopupAdicionarTopico: View {
                         .padding()
                         .background(Color(.secondarySystemBackground))
                         .cornerRadius(8)
-
                     Button(LocalizedStringKey("add")) {
                         if !nomeNovoItemFilho.isEmpty {
                             let novoItem = ItemFilho(nome: nomeNovoItemFilho, foiExecutado: false)
                             withAnimation(.easeInOut(duration: 0.2)) {
-                                itensFilhoRelacionados.append(novoItem)
+                                itensFilhoEditaveis.append(novoItem)
+                                HapticFeedbackManager.shared.play(.light)
                             }
                             nomeNovoItemFilho = ""
                         }
@@ -49,76 +47,91 @@ struct PopupAdicionarTopico: View {
                     .estiloBotaoPequeno()
                 }
                 .padding(.horizontal)
-            }
-            .padding(.bottom)
+                .padding(.bottom)
 
-            Spacer()
+                Spacer()
 
-            if !itensFilhoRelacionados.isEmpty {
-                Text("items", bundle: .main)
-                    .font(.subheadline)
-                    .padding(.horizontal)
+                if !itensFilhoEditaveis.isEmpty { // Usar itensFilhoEditaveis
+                    Text("items", bundle: .main)
+                        .font(.subheadline)
+                        .padding(.horizontal)
 
-                List {
-                    ForEach($itensFilhoRelacionados) { $item in
-                        HStack {
-                            Image(systemName: "circle")
-                                .foregroundColor(.black)
-                                .padding(.trailing, 5)
+                    List {
+                        ForEach($itensFilhoEditaveis) { $itemFilho in // Use $ para Binding para ItemFilho
+                            HStack {
+                                Image(systemName: "circle")
+                                    .foregroundColor(.black)
+                                    .padding(.trailing, 5)
 
-                            if item.id == indiceItemEmEdicao {
-                                TextField(LocalizedStringKey("edit_list"), text: $item.nome)
-                                    .focused($textFieldEmFoco, equals: item.id)
-                                    .onSubmit {
-                                        indiceItemEmEdicao = nil
-                                    }
-                            } else {
-                                Text(item.nome)
-                                    .onTapGesture {
-                                        indiceItemEmEdicao = item.id
-                                        DispatchQueue.main.async {
-                                            textFieldEmFoco = item.id
+                                if itemFilho.id == indiceItemEmEdicao {
+                                    TextField(LocalizedStringKey("edit_list"), text: $itemFilho.nome)
+                                        .focused($textFieldEmFoco, equals: itemFilho.id)
+                                        .onSubmit {
+                                            indiceItemEmEdicao = nil
                                         }
-                                    }
+                                } else {
+                                    Text(itemFilho.nome)
+                                        .onTapGesture {
+                                            indiceItemEmEdicao = itemFilho.id
+                                            DispatchQueue.main.async {
+                                                textFieldEmFoco = itemFilho.id
+                                            }
+                                        }
+                                }
                             }
+                            .padding(.vertical, 8)
+                            .listRowBackground(Color(.systemGray6).opacity(0.3))
+                            .cornerRadius(8)
                         }
-                        .padding(.vertical, 8)
-                        .listRowBackground(Color(.systemGray6).opacity(0.3))
-                        .cornerRadius(8)
+                        .onDelete(perform: removerItemFilho)
+                        .onMove(perform: moverItemFilho)
                     }
-                    .onDelete(perform: removerItemFilho)
-                    .onMove(perform: moverItemFilho)
+                    .frame(maxHeight: .infinity)
+                    .cornerRadius(8)
+                    .padding(.horizontal)
+                    .listStyle(PlainListStyle())
                 }
-                .frame(maxHeight: .infinity)
-                .cornerRadius(8)
-                .padding(.horizontal)
-                .listStyle(PlainListStyle())
             }
-
-            Button(LocalizedStringKey("add")) {
-                onAdicionar(titulo, descricao, itensFilhoRelacionados)
-                mostrarPopup = false
+            .navigationTitle(itemParaEditar == nil ? LocalizedStringKey("add_new_list") : LocalizedStringKey("edit_list_title"))
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(LocalizedStringKey("cancelButton")) {
+                        mostrarPopup = false
+                        HapticFeedbackManager.shared.play(.light)
+                    }
+                }
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button(itemParaEditar == nil ? LocalizedStringKey("add") : LocalizedStringKey("saveButton")) {
+                        onSave(tituloLocal, descricaoLocal, itensFilhoEditaveis)
+                        mostrarPopup = false
+                        HapticFeedbackManager.shared.play(.medium)
+                    }
+                    .disabled(tituloLocal.isEmpty)
+                }
             }
-            .estiloBotaoPadrao()
-            .padding(.bottom)
-            .disabled(titulo.isEmpty)
-            .opacity(titulo.isEmpty ? 0.5 : 1.0)
-        }
-        .padding()
-        .onDisappear {
-            titulo = ""
-            descricao = ""
-            itensFilhoRelacionados = []
-            nomeNovoItemFilho = ""
-            indiceItemEmEdicao = nil
+            .onAppear {
+                if let item = itemParaEditar {
+                    tituloLocal = item.titulo
+                    descricaoLocal = item.descricao
+                    itensFilhoEditaveis = item.itensRelacionados.map { ItemFilho(nome: $0.nome, foiExecutado: $0.foiExecutado) }
+                } else {
+                    tituloLocal = ""
+                    descricaoLocal = ""
+                    itensFilhoEditaveis = []
+                    nomeNovoItemFilho = ""
+                    indiceItemEmEdicao = nil
+                }
+            }
         }
     }
 
     func removerItemFilho(at offsets: IndexSet) {
-        itensFilhoRelacionados.remove(atOffsets: offsets)
+        itensFilhoEditaveis.remove(atOffsets: offsets)
+        HapticFeedbackManager.shared.play(.light)
     }
 
     func moverItemFilho(from source: IndexSet, to destination: Int) {
-        itensFilhoRelacionados.move(fromOffsets: source, toOffset: destination)
+        itensFilhoEditaveis.move(fromOffsets: source, toOffset: destination)
     }
 }

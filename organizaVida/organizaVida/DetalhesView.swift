@@ -7,22 +7,6 @@ struct DetalheItemView: View {
     @State private var mostrarPopup = false
     @State private var nomeItemFilho = ""
     @State private var isShareSheetShowing = false
-
-    private var shareableContent: String {
-        var text = "\(item.titulo)\n\n"
-        if !item.descricao.isEmpty {
-            text += "\(item.descricao)\n\n"
-        }
-        if !item.itensRelacionados.isEmpty {
-            text += "\(LocalizedStringKey("items")):\n"
-            for itemFilho in item.itensRelacionados.sorted(by: { !$0.foiExecutado && $1.foiExecutado }) {
-                text += "- \(itemFilho.nome) \(itemFilho.foiExecutado ? " ✅" : "")\n"
-            }
-        } else {
-            text += "\(LocalizedStringKey("empty_share_list"))\n"
-        }
-        return text
-    }
     
     var body: some View {
         ZStack {
@@ -37,6 +21,7 @@ struct DetalheItemView: View {
                                 Button(action: {
                                     withAnimation {
                                         itemFilho.foiExecutado.toggle()
+                                        UIImpactFeedbackGenerator(style: .light).impactOccurred()
                                     }
                                 }) {
                                     Image(systemName: itemFilho.foiExecutado ? "checkmark.square" : "square")
@@ -69,6 +54,7 @@ struct DetalheItemView: View {
                     Button(LocalizedStringKey("add")) {
                         withAnimation(.easeInOut(duration: 0.2)) {
                             item.itensRelacionados.append(ItemFilho(nome: nomeItemFilho, foiExecutado: false))
+                            UIImpactFeedbackGenerator(style: .medium).impactOccurred()
                         }
                         nomeItemFilho = ""
                     }
@@ -84,7 +70,7 @@ struct DetalheItemView: View {
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .navigationBarTrailing) {
-                ShareLink(item: shareableContent) {
+                ShareLink(item: gerarConteudoParaCompartilhar(item: item)) {
                     Image(systemName: "square.and.arrow.up")
                 }
             }
@@ -92,10 +78,22 @@ struct DetalheItemView: View {
     }
     
     func removerItemFilho(at offsets: IndexSet) {
-        withAnimation {
-            offsets.map { item.itensRelacionados[$0] }.forEach { itemFilhoParaRemover in
-                modelContext.delete(itemFilhoParaRemover)
-            }
-        }
-    }
+           withAnimation {
+               // Primeiro, obtenha os itens a serem removidos da LISTA ORIGINAL
+               // Isso evita problemas com a array temporária ordenada do ForEach
+               let itensParaDeletar = offsets.map { item.itensRelacionados.sorted(by: { !$0.foiExecutado && $1.foiExecutado })[$0] }
+
+               // Depois, remova os itens da relação no Item pai
+               item.itensRelacionados.removeAll { itemFilho in
+                   itensParaDeletar.contains(where: { $0.id == itemFilho.id }) // Compare por ID
+               }
+
+               // E então, delete-os do ModelContext
+               for itemFilho in itensParaDeletar {
+                   modelContext.delete(itemFilho)
+               }
+               HapticFeedbackManager.shared.play(.medium)
+           }
+       }
+
 }
